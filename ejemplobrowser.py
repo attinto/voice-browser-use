@@ -2,7 +2,7 @@ from call_browser_use import run_browser_task
 
 def main():
     # Ejemplo de uso de la función
-    task = "¿Qué temperatura hace en Madrid?"
+    task = "¿Qué temperatura hace en venezuela?"
     resultado = run_browser_task(task)
     print(f"Resultado de la tarea: {resultado}")
 

@@ -5,7 +5,7 @@ import asyncio
 from dotenv import load_dotenv
 from lmnr import Laminar
 
-# Laminar.initialize() # you can also pass project api key here
+Laminar.initialize(project_api_key="vq0QbFrHbQrjniDJ1dyRH3PSGWN4lFflnJDFlGXZr4InVakvok97YniMjYCJKwF7") # you can also pass project api key here
 load_dotenv()
 
 async def get_browser_response(task: str) -> str:
