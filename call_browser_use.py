@@ -18,25 +18,36 @@ class BrowserTaskManager:
         self.running = True
         self.worker_thread = None
         self.current_task = None
+        self.executor = ThreadPoolExecutor(max_workers=1)
         
     def start(self):
-        self.worker_thread = threading.Thread(target=self._process_tasks)
-        self.worker_thread.daemon = True
-        self.worker_thread.start()
+        if not self.worker_thread or not self.worker_thread.is_alive():
+            self.running = True
+            self.worker_thread = threading.Thread(target=self._process_tasks)
+            self.worker_thread.daemon = True
+            self.worker_thread.start()
         
     def stop(self):
         self.running = False
-        if self.worker_thread:
-            self.worker_thread.join()
-            
+        if self.executor:
+            self.executor.shutdown(wait=False)
+        if self.worker_thread and self.worker_thread.is_alive():
+            try:
+                self.worker_thread.join(timeout=1.0)  # Wait max 1 second
+            except:
+                pass  # If thread doesn't join, continue with cleanup
+        self.task_queue = queue.Queue()  # Clear pending tasks
+        self.result_queue = queue.Queue()  # Clear pending results
+        
     def _process_tasks(self):
         while self.running:
             try:
-                task = self.task_queue.get(timeout=1)
+                task = self.task_queue.get(timeout=0.5)  # Reduced timeout
                 if task:
                     try:
                         self.current_task = task
-                        result = asyncio.run(self._execute_browser_task(task))
+                        future = self.executor.submit(asyncio.run, self._execute_browser_task(task))
+                        result = future.result(timeout=30)  # 30 second timeout for browser tasks
                         self.result_queue.put((task, result))
                     except Exception as e:
                         self.result_queue.put((task, f"Error executing task: {str(e)}"))
@@ -44,6 +55,8 @@ class BrowserTaskManager:
                         self.current_task = None
             except queue.Empty:
                 continue
+            except Exception:
+                continue  # Handle any other exceptions gracefully
                 
     async def _execute_browser_task(self, task: str):
         config = BrowserConfig(
