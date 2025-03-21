@@ -4,7 +4,44 @@
   <img alt="Shows a black Browser Use Logo in light color mode and a white one in dark color mode." src="./static/browser-use.png"  width="full">
 </picture>
 
-<h1 align="center">Enable AI to control your browser 🤖</h1>
+<h1 align="center">Voice Agent + Browser Use Integration 🤖🎙️</h1>
+
+Este proyecto es un fork de [browser-use](https://github.com/gregpr07/browser-use) que añade capacidades de control por voz utilizando la API Realtime de OpenAI.
+
+## ¿Qué hace este fork?
+
+Este fork integra un agente de voz con browser-use, permitiendo el control por voz del navegador. El agente principal (`main.py`) implementa:
+
+1. **Conexión con OpenAI Realtime API**:
+   - Establece una conexión WebSocket con la API de OpenAI
+   - Gestiona streams de audio bidireccionales (entrada de micrófono y salida de voz)
+   - Procesa la transcripción de voz a texto y la síntesis de texto a voz
+
+2. **Integración con browser-use**:
+   - Cuando el usuario solicita una acción relacionada con el navegador, el agente de voz pausa temporalmente
+   - Delega la tarea al agente de browser-use
+   - Retoma la interacción por voz una vez completada la tarea
+
+3. **Funciones adicionales**:
+   - Control de aplicaciones del sistema (cámara, WhatsApp, etc.)
+   - Bloqueo del ordenador
+   - Toma de notas
+   - Consulta del clima
+
+## Arquitectura de la Integración
+
+El agente de voz y browser-use se comunican de la siguiente manera:
+
+1. El usuario da una instrucción por voz
+2. Si la instrucción requiere interacción con el navegador:
+   - El agente de voz llama a `run_browser_task(prompt)`
+   - Se pausa temporalmente el agente de voz
+   - browser-use ejecuta la tarea solicitada
+   - El agente de voz se reactiva para continuar la interacción
+
+## Repositorio Original
+
+Este proyecto está basado en [browser-use](https://github.com/gregpr07/browser-use), una potente biblioteca que permite a los agentes de IA controlar el navegador. Te recomendamos visitar el repositorio original para entender mejor las capacidades base de automatización del navegador.
 
 [![GitHub stars](https://img.shields.io/github/stars/gregpr07/browser-use?style=social)](https://github.com/gregpr07/browser-use/stargazers)
 [![Discord](https://img.shields.io/discord/1303749220842340412?color=7289DA&label=Discord&logo=discord&logoColor=white)](https://link.browser-use.com/discord)

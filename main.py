@@ -196,12 +196,9 @@ def handle_function_call(event_json, ws):
             # Extract arguments from the event JSON
             city = function_call_args.get("city", "")
 
-            # Extract the call_id from the event JSON
 
-            # If the city is provided, call get_weather and send the result
             if city:
                 weather_result = get_weather(city)
-                # wait http response  -> send fc result to openai
                 send_function_call_result(weather_result, call_id, ws)
             else:
                 print("City not provided for get_weather function.")
@@ -209,7 +206,6 @@ def handle_function_call(event_json, ws):
         elif name == "open_camera":
             try:
                 if sys.platform == "darwin":  # macOS
-                    # You can use either "Photo Booth" or "FaceTime"
                     subprocess.run(["open", "-a", "Photo Booth"])
                     send_function_call_result("Aplicación de cámara abierta exitosamente.", call_id, ws)
                 else:
@@ -218,23 +214,20 @@ def handle_function_call(event_json, ws):
                 send_function_call_result(f"Error al abrir la cámara: {str(e)}", call_id, ws)
 
         elif name == "open_browser_and_execute":
-            # Extract the prompt from the event JSON
             prompt = function_call_args.get("prompt", "")
 
             if prompt:
                 try:
                     print("Cerrando agente de voz para ejecutar tarea en el navegador...")
-                    stop_voice_agent()  # Detiene el agente de voz
-                    # Use the run_browser_task function to perform a task with the browser agent
+                    stop_voice_agent()  
                     result = run_browser_task(prompt)
                     if result:
                         send_function_call_result(result, call_id, ws)
                     else:
                         send_function_call_result("No se pudo completar la tarea del navegador.", call_id, ws)
-                    # Reiniciar el agente de voz después de completar la tarea
                     print("Reiniciando agente de voz...")
-                    stop_event.clear()  # Asegurarse de que el evento de parada esté limpio
-                    connect_to_openai()  # Reconectar al WebSocket para reiniciar el agente de voz
+                    stop_event.clear()  
+                    connect_to_openai() 
                 except Exception as e:
                     print(f"Error executing browser task: {e}")
                     send_function_call_result(f"Error al ejecutar la tarea del navegador: {str(e)}", call_id, ws)
@@ -364,21 +357,6 @@ def send_fc_session_update(ws):
             },
             "tool_choice": "auto",
             "tools": [
-                {
-                    "type": "function",
-                    "name": "get_weather",
-                    "description": "Gets the current weather information for a specific city. Use when the user asks about the weather, temperature, or meteorological conditions of any city.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "city": {
-                                "type": "string",
-                                "description": "The name of the city for which to get weather information."
-                            }
-                        },
-                        "required": ["city"]
-                    }
-                },
                 {
                     "type": "function",
                     "name": "write_notepad",
